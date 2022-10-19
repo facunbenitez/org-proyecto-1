@@ -38,8 +38,4 @@ int cp_cantidad(TColaCP cola);
 
 void cp_destruir(TColaCP cola, void (*fEliminar)(TEntrada));
 
-int f(TEntrada, TEntrada);
-
-int fEliminar(TEntrada);
-
 #endif

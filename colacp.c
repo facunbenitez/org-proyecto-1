@@ -5,7 +5,7 @@
 
 const int TRUE = 1;
 const int FALSE = 0;
-const int CCP_NO_INI = -1;
+const int CCP_NO_INI = 2;
 const void* POS_NULA = NULL;
 const void* ELE_NULO = NULL;
 
@@ -74,6 +74,17 @@ TEntrada cp_eliminar(TColaCP cola){
 
     free(sizeof(struct nodo)); //PREGUNTAR SI SE HACE ACÁ O MAS ADELANTE
 }
+
+int cp_cantidad(TColaCP cola){
+    return cola->cantidad_elementos;
+}
+
+void cp_destruir(TColaCP cola, void (*fEliminar)(TEntrada)){
+    fEliminar(cola->raiz);
+    free(cola);
+}
+
+
 
 
 
