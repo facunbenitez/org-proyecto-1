@@ -10,8 +10,12 @@ const void* POS_NULA = NULL;
 const void* ELE_NULO = NULL;
 
 //TODO: implementar busqueda de la primer posicion valida para insertar un nuevo nodo
-TNodo encontrarPrimerPosNula(TNodo nodo){
-    return nodo;
+TNodo encontrarPrimerPosNula(TNodo * nodo){
+    if(*nodo != ELE_NULO){ //Que se almacena en direcciones de memeoria vacias?
+        encontrarPrimerPosNula(nodo * 2)
+        encontrarPrimerPosNula(nodo * 2 +1)
+    }
+    return *nodo;
 }
 
 TColaCP crear_cola_cp(int (*f)(TEntrada, TEntrada)){
@@ -37,7 +41,7 @@ int cp_insertar(TColaCP cola, TEntrada entr){
     //Si hay raiz, busco un lugar para meter la nueva entrada
     else {
 
-        TNodo padre = encontrarPrimerPosNula(cola->raiz);
+        TNodo padre = encontrarPrimerPosNula(&cola->raiz);
         nuevoNodo->padre = padre;
 
         if(padre->hijo_izquierdo==ELE_NULO)
@@ -51,9 +55,24 @@ int cp_insertar(TColaCP cola, TEntrada entr){
             return 0;
         }
 
+        if(cola_con_prioridad ->comparador(nuevoNodo.entrada, cola_con_prioridad.raiz.entrada))
+            shellBurbuja(&cola->raiz)
+
     }
     cola->cantidad_elementos++;
     return 1;
+}
+
+TEntrada cp_eliminar(TColaCP cola){
+    if(cola -> cantidad_elementos == 1){
+        cola -> raiz = ELE_NULO;
+        cola -> cantidad_elementos = 0;
+    }
+    else {
+        cola -> raiz =
+    }
+
+    free(sizeof(struct nodo)); //PREGUNTAR SI SE HACE ACÁ O MAS ADELANTE
 }
 
 
