@@ -12,10 +12,21 @@ const void* ELE_NULO = NULL;
 //TODO: implementar busqueda de la primer posicion valida para insertar un nuevo nodo
 TNodo encontrarPrimerPosNula(TNodo * nodo){
     if(*nodo != ELE_NULO){ //Que se almacena en direcciones de memeoria vacias?
-        encontrarPrimerPosNula(nodo * 2)
-        encontrarPrimerPosNula(nodo * 2 +1)
+        TNodo nIzq = encontrarPrimerPosNula(nodo * 2);
+        TNodo nDer = encontrarPrimerPosNula(nodo * 2 + sizeof(struct nodo));
     }
     return *nodo;
+}
+
+TNodo encontrarUltimoNodo(TNodo * nodo){
+        TNodo nIzq = encontrarPrimerPosNula(nodo * 2);
+        TNodo nDer = encontrarPrimerPosNula(nodo * 2 + sizeof(struct nodo));
+
+    if(nDer != ELE_NULO)
+        return nDer;
+    else
+        if(nIzq != ELE_NULO)
+            return nIzq;
 }
 
 TColaCP crear_cola_cp(int (*f)(TEntrada, TEntrada)){
@@ -64,15 +75,33 @@ int cp_insertar(TColaCP cola, TEntrada entr){
 }
 
 TEntrada cp_eliminar(TColaCP cola){
+    TEntrada aRetornar = cola -> raiz.entrada;
+
     if(cola -> cantidad_elementos == 1){
         cola -> raiz = ELE_NULO;
         cola -> cantidad_elementos = 0;
     }
     else {
-        cola -> raiz =
+        TNodo nuevaRaiz = encontrarUltimoNodo(&cola->raiz);
+        TNodo hI = *(&(cola->raiz)*2);
+        TNodo hD = *(&(cola->raiz)*2 + sizeof(struct nodo))
+        hI.padre = nuevaRaiz;
+        hD.padre = nuevaRaiz;
+        cola -> raiz.entrada = ELE_NULO;
+        cola -> raiz.hijo_derecho = POS_NULA;
+        cola -> raiz.hijo_izquierdo = POS_NULA;
+        cola -> raiz = nuevaRaiz;
+        if(cola ->raiz.padre->hijo_derecho != POS_NULA)
+            cola ->raiz.padre->hijo_derecho = POS_NULA;
+        else
+            cola ->raiz.padre->hijo_izquierdo = POS_NULA;
+        cola -> raiz.padre = POS_NULA;
+
+        //FALTA BURBUJEAR TODO.
     }
 
-    free(sizeof(struct nodo)); //PREGUNTAR SI SE HACE ACÁ O MAS ADELANTE
+    free(sizeof(struct nodo));//PREGUNTAR SI SE HACE ACÁ O MAS ADELANTE
+    return aRetornar;
 }
 
 int cp_cantidad(TColaCP cola){
@@ -80,8 +109,23 @@ int cp_cantidad(TColaCP cola){
 }
 
 void cp_destruir(TColaCP cola, void (*fEliminar)(TEntrada)){
+    if(cola->raiz.hijo_izquierdo != POS_NULA)
+        cp_destruirRec(cola->raiz.hijo_izquierdo,*fEliminar(TEntrada));
+    if(cola->raiz.hijo_derecho != POS_NULA)
+        cp_destruirRec(cola->raiz.hijo_derecho,*fEliminar(TEntrada));
     fEliminar(cola->raiz);
+    free(cola->raiz);
     free(cola);
+}
+
+//Declarar privado
+void cp_destruirRec(*TNodo nodo, void(*fEliminar)(TEntrada)){
+    if(nodo.hijo_izquierdo != POS_NULA)
+        cp_destruirRec(nodo.hijo_izquierdo,*fEliminar(TEntrada));
+    if(nodo.hijo_derecho != POS_NULA)
+        cp_destruirRec(nodo.hijo_derecho,*fEliminar(TEntrada));
+    fEliminar(nodo);
+    free(nodo);
 }
 
 
