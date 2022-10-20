@@ -10,12 +10,35 @@ const void* POS_NULA = NULL;
 const void* ELE_NULO = NULL;
 
 //TODO: implementar busqueda de la primer posicion valida para insertar un nuevo nodo
-TNodo encontrarPrimerPosNula(TNodo * nodo){
+/*TNodo encontrarPrimerPosNula(TNodo nodo){
     if(*nodo != ELE_NULO){ //Que se almacena en direcciones de memeoria vacias?
         TNodo nIzq = encontrarPrimerPosNula(nodo * 2);
         TNodo nDer = encontrarPrimerPosNula(nodo * 2 + sizeof(struct nodo));
     }
-    return *nodo;
+    return *nodo;}*/
+
+TNodo insertarEnCompleto (TNodo nodo){
+    TNodo nuevoNodo = nodo;
+    if(nodo.hijo_izquierdo != POS_NULA)
+            nuevoNodo = insertarEnCompleto(*nodo.hijo_izquierdo);
+    return nuevoNodo;
+}
+
+TNodo insertarEnNormal (TNodo nodo, int nivel, int alt){
+    TNodo nodoAux = POS_NULA;
+    if(nivel < alt && nodoAux == POS_NULA ){
+        if (nivel != alt -1){
+            if(nodo.hijo_izquierdo != POS_NULA)
+                nodoAux = insertarEnNormal(*nodo.hijo_izquierdo, nivel+1, alt );
+            if(nodo.hijo_derecho != POS_NULA)
+                nodoAux = insertarEnNormal (*nodo.hijo_derecho, nivel+1, alt);
+        }
+        else{
+            if(*nodo.hijo_izquierdo == POS_NULA || *nodo.hijo_derecho == POS_NULA)
+                nodoAux = nodo;
+        }
+    }
+    return nodoAux;
 }
 
 TNodo encontrarUltimoNodo(TNodo * nodo){
@@ -52,7 +75,22 @@ int cp_insertar(TColaCP cola, TEntrada entr){
     //Si hay raiz, busco un lugar para meter la nueva entrada
     else {
 
-        TNodo padre = encontrarPrimerPosNula(&cola->raiz);
+        //Reviso en que caso de insercion estoy
+        int i = 1;
+        int alt = 1;
+        while(i < cola.cantidad_elementos){
+            i = i*2;
+            alt++;
+        }
+
+        //Ubico el padre de mi nuevo nodo en funcion del estado de mi heap
+        TNodo padre = null;
+        if(cola.cantidad_elementos+1 = i){
+            padre = insertarEnCompleto(cola.raiz);
+        }
+        else{
+            padre = insertarEnNormal(cola.raiz, 0, alt);
+        }
         nuevoNodo->padre = padre;
 
         if(padre->hijo_izquierdo==ELE_NULO)
@@ -82,7 +120,7 @@ TEntrada cp_eliminar(TColaCP cola){
         cola -> cantidad_elementos = 0;
     }
     else {
-        TNodo nuevaRaiz = encontrarUltimoNodo(&cola->raiz);
+        TNodo nuevaRaiz = encontrarUltimoNodo(cola->raiz);
         TNodo hI = *(&(cola->raiz)*2);
         TNodo hD = *(&(cola->raiz)*2 + sizeof(struct nodo))
         hI.padre = nuevaRaiz;
