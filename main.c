@@ -38,6 +38,7 @@ int main()
     TEntrada e4 = malloc(sizeof(TEntrada));
     TEntrada e5 = malloc(sizeof(TEntrada));
     TEntrada e6 = malloc(sizeof(TEntrada));
+    TEntrada e7 = malloc(sizeof(TEntrada));
 
     e->clave = 1;
     e->valor = 1;
@@ -53,18 +54,21 @@ int main()
 
     e5->clave = 5;
     e5->valor = 5;
+
     e6->clave = 6;
     e6->valor = 6;
+
+    e7->clave = 7;
+    e7->valor = 7;
 
     cp_insertar(cola, e);
     cp_insertar(cola, e2);
     cp_insertar(cola, e3);
-
     cp_insertar(cola, e4);
-
     cp_insertar(cola, e5);
     cp_insertar(cola, e6);
-
+    cp_insertar(cola, e7);
+    //printf("Raiz: %i\n", cola->raiz->entrada->clave);
     //printf("%i \n",cp_insertar(cola, e2));
     printf("Recorrido inorder: \n");
     recorridoInorden(cola->raiz);

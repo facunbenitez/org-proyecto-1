@@ -24,21 +24,45 @@ TNodo insertarEnCompleto (TNodo nodo){
     return nuevoNodo;
 }
 
-TNodo insertarEnNormal (TNodo nodo, int nivel, int alt, TNodo nodoP){
-    TNodo nodoAux = nodoP;
-    if(nivel < alt && nodoAux == POS_NULA ){
-        if (nivel != alt -1){
-            if(nodo->hijo_izquierdo != POS_NULA)
-                nodoAux = insertarEnNormal(nodo->hijo_izquierdo, nivel+1, alt, nodo );
-            if(nodo->hijo_derecho != POS_NULA)
-                nodoAux = insertarEnNormal (nodo->hijo_derecho, nivel+1, alt, nodo);
-        }
-        else{
-            if(nodo->hijo_izquierdo == POS_NULA || nodo->hijo_derecho == POS_NULA)
-                nodoAux = nodo;
-        }
+TNodo insertarEnNormal (TNodo nodo, int nivel, int alt){
+    //Caso base, estoy en el nivel de insercion.
+    //Si uno de los hijos del nodo es POS_NULA, retorno ese nodo
+    //Caso contrario, retorno POS_NULA
+    if(nivel==alt-1){
+        if(nodo->hijo_izquierdo == POS_NULA || nodo->hijo_derecho == POS_NULA)
+            return nodo;
+        else
+            return POS_NULA;
     }
-    return nodoAux;
+
+    //Caso rec., No estoy en el nivel de insercion.
+    //nodoAux sera insercionEnNormal(NI, nivel+1, alt)
+    //Si nodoAux es POS_NULA le asigno a nodoAux insercionEnNormal(ND, nivel+1, alt)
+    //NI es el hijo izq. del nodo. ND es el hijo der. del nodo.
+    else{
+        TNodo nodoAux = insertarEnNormal(nodo->hijo_izquierdo, nivel+1, alt);
+
+        if(nodoAux == POS_NULA)
+            nodoAux = insertarEnNormal(nodo->hijo_derecho, nivel+1, alt);
+
+        return nodoAux;
+    }
+
+/*    if(nodoAux == POS_NULA)
+        if(nivel < alt){
+            if (nivel != (alt -1)){
+                if(nodo->hijo_izquierdo != POS_NULA)
+                    nodoAux = insertarEnNormal(nodo->hijo_izquierdo, nivel+1, alt, nodo);
+                if(nodo->hijo_derecho != POS_NULA)
+                    nodoAux = insertarEnNormal (nodo->hijo_derecho, nivel+1, alt, nodo);
+            }
+            else if(nivel == (alt -1)){
+                if(nodo->hijo_izquierdo == POS_NULA || nodo->hijo_derecho == POS_NULA)
+                    return nodo;
+                else return POS_NULA;
+            }
+        }
+    return nodoAux;*/
 }
 
 
@@ -65,19 +89,19 @@ int cp_insertar(TColaCP cola, TEntrada entr){
 
     //Si hay raiz, busco un lugar para meter la nueva entrada
     else {
-
         //Reviso en que caso de insercion estoy
-        int i = 1;
-        int alt = 1;
 
-        TNodo aux = cola->raiz;
-        while(aux!=POS_NULA){
-            alt++;
-            aux = aux->hijo_izquierdo;
-        }
+        int i = 1;
+        /* ECUACION PARA HALLAR LA ALTURA
+        ** 2^h -1 = cant_elems
+        ** 2^h = cant_elems + 1
+        ** h = log2(cant_elems + 1) */
+        int alt = (log(cola->cantidad_elementos + 1) / log(2));
+
         while(i < alt){
             i = i*2;
         }
+
         //Ubico el padre de mi nuevo nodo en funcion del estado de mi heap
         TNodo padre = POS_NULA;
         if(cola->cantidad_elementos + 1 == i){
@@ -87,8 +111,8 @@ int cp_insertar(TColaCP cola, TEntrada entr){
         }
 
         else{
-            padre = insertarEnNormal(cola->raiz, 0, alt, cola->raiz);
-            printf("Hola entre xd %i\n", padre->entrada->clave);
+
+            padre = insertarEnNormal(cola->raiz, 0, alt);
             if(padre->hijo_izquierdo==POS_NULA)
                 padre->hijo_izquierdo = nuevoNodo;
             else
