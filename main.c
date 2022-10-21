@@ -36,23 +36,34 @@ int main()
     TEntrada e2 = malloc(sizeof(TEntrada));
     TEntrada e3 = malloc(sizeof(TEntrada));
     TEntrada e4 = malloc(sizeof(TEntrada));
+    TEntrada e5 = malloc(sizeof(TEntrada));
+    TEntrada e6 = malloc(sizeof(TEntrada));
 
-    e->clave = 111;
-    e->valor = 164;
+    e->clave = 1;
+    e->valor = 1;
 
-    e2->clave = 222;
-    e2->valor = 238;
+    e2->clave = 2;
+    e2->valor = 2;
 
-    e3->clave = 333;
-    e3->valor = 379;
+    e3->clave = 3;
+    e3->valor = 3;
 
-    e4->clave = 444;
-    e4->valor = 412;
+    e4->clave = 4;
+    e4->valor = 4;
+
+    e5->clave = 5;
+    e5->valor = 5;
+    e6->clave = 6;
+    e6->valor = 6;
 
     cp_insertar(cola, e);
     cp_insertar(cola, e2);
     cp_insertar(cola, e3);
+
     cp_insertar(cola, e4);
+
+    cp_insertar(cola, e5);
+    cp_insertar(cola, e6);
 
     //printf("%i \n",cp_insertar(cola, e2));
     printf("Recorrido inorder: \n");

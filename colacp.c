@@ -19,38 +19,29 @@ const void* ELE_NULO = NULL;
 
 TNodo insertarEnCompleto (TNodo nodo){
     TNodo nuevoNodo = nodo;
-    if(nodo.hijo_izquierdo != POS_NULA)
-            nuevoNodo = insertarEnCompleto(*nodo.hijo_izquierdo);
+    if(nodo->hijo_izquierdo != POS_NULA)
+        nuevoNodo = insertarEnCompleto(nodo->hijo_izquierdo);
     return nuevoNodo;
 }
 
-TNodo insertarEnNormal (TNodo nodo, int nivel, int alt){
-    TNodo nodoAux = POS_NULA;
+TNodo insertarEnNormal (TNodo nodo, int nivel, int alt, TNodo nodoP){
+    TNodo nodoAux = nodoP;
     if(nivel < alt && nodoAux == POS_NULA ){
         if (nivel != alt -1){
-            if(nodo.hijo_izquierdo != POS_NULA)
-                nodoAux = insertarEnNormal(*nodo.hijo_izquierdo, nivel+1, alt );
-            if(nodo.hijo_derecho != POS_NULA)
-                nodoAux = insertarEnNormal (*nodo.hijo_derecho, nivel+1, alt);
+            if(nodo->hijo_izquierdo != POS_NULA)
+                nodoAux = insertarEnNormal(nodo->hijo_izquierdo, nivel+1, alt, nodo );
+            if(nodo->hijo_derecho != POS_NULA)
+                nodoAux = insertarEnNormal (nodo->hijo_derecho, nivel+1, alt, nodo);
         }
         else{
-            if(*nodo.hijo_izquierdo == POS_NULA || *nodo.hijo_derecho == POS_NULA)
+            if(nodo->hijo_izquierdo == POS_NULA || nodo->hijo_derecho == POS_NULA)
                 nodoAux = nodo;
         }
     }
     return nodoAux;
 }
 
-TNodo encontrarUltimoNodo(TNodo * nodo){
-        TNodo nIzq = encontrarPrimerPosNula(nodo * 2);
-        TNodo nDer = encontrarPrimerPosNula(nodo * 2 + sizeof(struct nodo));
 
-    if(nDer != ELE_NULO)
-        return nDer;
-    else
-        if(nIzq != ELE_NULO)
-            return nIzq;
-}
 
 TColaCP crear_cola_cp(int (*f)(TEntrada, TEntrada)){
     TColaCP nuevaCola = malloc(sizeof(struct cola_con_prioridad));
@@ -65,11 +56,11 @@ int cp_insertar(TColaCP cola, TEntrada entr){
     TNodo nuevoNodo = malloc(sizeof(struct nodo));
     nuevoNodo->entrada = entr;
 
-    nuevoNodo->hijo_izquierdo = ELE_NULO;
-    nuevoNodo->hijo_derecho = ELE_NULO;
+    nuevoNodo->hijo_izquierdo = POS_NULA;
+    nuevoNodo->hijo_derecho = POS_NULA;
 
     //Inserto raiz, si no existe una
-    if(cola->raiz==ELE_NULO)
+    if(cola->raiz==POS_NULA)
         cola->raiz = nuevoNodo;
 
     //Si hay raiz, busco un lugar para meter la nueva entrada
@@ -78,42 +69,47 @@ int cp_insertar(TColaCP cola, TEntrada entr){
         //Reviso en que caso de insercion estoy
         int i = 1;
         int alt = 1;
-        while(i < cola.cantidad_elementos){
-            i = i*2;
+
+        TNodo aux = cola->raiz;
+        while(aux!=POS_NULA){
             alt++;
+            aux = aux->hijo_izquierdo;
         }
-
+        while(i < alt){
+            i = i*2;
+        }
         //Ubico el padre de mi nuevo nodo en funcion del estado de mi heap
-        TNodo padre = null;
-        if(cola.cantidad_elementos+1 = i){
-            padre = insertarEnCompleto(cola.raiz);
-        }
-        else{
-            padre = insertarEnNormal(cola.raiz, 0, alt);
-        }
-        nuevoNodo->padre = padre;
-
-        if(padre->hijo_izquierdo==ELE_NULO)
+        TNodo padre = POS_NULA;
+        if(cola->cantidad_elementos + 1 == i){
+            padre = (insertarEnCompleto(cola->raiz));
             padre->hijo_izquierdo = nuevoNodo;
 
-        else if(padre->hijo_derecho==ELE_NULO)
-            padre->hijo_derecho = nuevoNodo;
-
-        else{
-            free(nuevoNodo);
-            return 0;
         }
 
-        if(cola_con_prioridad ->comparador(nuevoNodo.entrada, cola_con_prioridad.raiz.entrada))
-            shellBurbuja(&cola->raiz)
+        else{
+            padre = insertarEnNormal(cola->raiz, 0, alt, cola->raiz);
+            printf("Hola entre xd %i\n", padre->entrada->clave);
+            if(padre->hijo_izquierdo==POS_NULA)
+                padre->hijo_izquierdo = nuevoNodo;
+            else
+                padre->hijo_derecho = nuevoNodo;
+        }
 
+        nuevoNodo->padre = padre;
+
+
+
+        if(cola->comparador(nuevoNodo->entrada, cola->raiz->entrada)){
+            //shellBurbuja(&cola->raiz);
+        }
     }
     cola->cantidad_elementos++;
     return 1;
 }
 
+/* REVISAR
 TEntrada cp_eliminar(TColaCP cola){
-    TEntrada aRetornar = cola -> raiz.entrada;
+    TEntrada aRetornar = cola->raiz->entrada;
 
     if(cola -> cantidad_elementos == 1){
         cola -> raiz = ELE_NULO;
@@ -141,27 +137,28 @@ TEntrada cp_eliminar(TColaCP cola){
     free(sizeof(struct nodo));//PREGUNTAR SI SE HACE ACÁ O MAS ADELANTE
     return aRetornar;
 }
+*/
 
 int cp_cantidad(TColaCP cola){
     return cola->cantidad_elementos;
 }
 
 void cp_destruir(TColaCP cola, void (*fEliminar)(TEntrada)){
-    if(cola->raiz.hijo_izquierdo != POS_NULA)
-        cp_destruirRec(cola->raiz.hijo_izquierdo,*fEliminar(TEntrada));
-    if(cola->raiz.hijo_derecho != POS_NULA)
-        cp_destruirRec(cola->raiz.hijo_derecho,*fEliminar(TEntrada));
+    if(cola->raiz->hijo_izquierdo != POS_NULA)
+        cp_destruirRec(cola->raiz->hijo_izquierdo, fEliminar);
+    if(cola->raiz->hijo_derecho != POS_NULA)
+        cp_destruirRec(cola->raiz->hijo_derecho,fEliminar);
     fEliminar(cola->raiz);
     free(cola->raiz);
     free(cola);
 }
 
 //Declarar privado
-void cp_destruirRec(*TNodo nodo, void(*fEliminar)(TEntrada)){
-    if(nodo.hijo_izquierdo != POS_NULA)
-        cp_destruirRec(nodo.hijo_izquierdo,*fEliminar(TEntrada));
-    if(nodo.hijo_derecho != POS_NULA)
-        cp_destruirRec(nodo.hijo_derecho,*fEliminar(TEntrada));
+void cp_destruirRec(TNodo nodo, void(*fEliminar)(TEntrada)){
+    if(nodo->hijo_izquierdo != POS_NULA)
+        cp_destruirRec(nodo->hijo_izquierdo,fEliminar);
+    if(nodo->hijo_derecho != POS_NULA)
+        cp_destruirRec(nodo->hijo_derecho,fEliminar);
     fEliminar(nodo);
     free(nodo);
 }
