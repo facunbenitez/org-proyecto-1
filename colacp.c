@@ -9,14 +9,7 @@ const int CCP_NO_INI = 2;
 const void* POS_NULA = NULL;
 const void* ELE_NULO = NULL;
 
-//TODO: implementar busqueda de la primer posicion valida para insertar un nuevo nodo
-/*TNodo encontrarPrimerPosNula(TNodo nodo){
-    if(*nodo != ELE_NULO){ //Que se almacena en direcciones de memeoria vacias?
-        TNodo nIzq = encontrarPrimerPosNula(nodo * 2);
-        TNodo nDer = encontrarPrimerPosNula(nodo * 2 + sizeof(struct nodo));
-    }
-    return *nodo;}*/
-
+//HACER PRIVADO
 TNodo insertarEnCompleto (TNodo nodo){
     TNodo nuevoNodo = nodo;
     if(nodo->hijo_izquierdo != POS_NULA)
@@ -24,6 +17,7 @@ TNodo insertarEnCompleto (TNodo nodo){
     return nuevoNodo;
 }
 
+//HACER PRIVADO
 TNodo insertarEnNormal (TNodo nodo, int nivel, int alt){
     //Caso base, estoy en el nivel de insercion.
     //Si uno de los hijos del nodo es POS_NULA, retorno ese nodo
@@ -47,39 +41,15 @@ TNodo insertarEnNormal (TNodo nodo, int nivel, int alt){
 
         return nodoAux;
     }
-
-/*    if(nodoAux == POS_NULA)
-        if(nivel < alt){
-            if (nivel != (alt -1)){
-                if(nodo->hijo_izquierdo != POS_NULA)
-                    nodoAux = insertarEnNormal(nodo->hijo_izquierdo, nivel+1, alt, nodo);
-                if(nodo->hijo_derecho != POS_NULA)
-                    nodoAux = insertarEnNormal (nodo->hijo_derecho, nivel+1, alt, nodo);
-            }
-            else if(nivel == (alt -1)){
-                if(nodo->hijo_izquierdo == POS_NULA || nodo->hijo_derecho == POS_NULA)
-                    return nodo;
-                else return POS_NULA;
-            }
-        }
-    return nodoAux;*/
 }
 
-//No funciona, preguntar
-void burbujeoArriba(TColaCP cola, TNodo *nodo,TNodo *padre){
-    int cont = TRUE;
-    int i = cola->cantidad_elementos;
-    while(i>1 && cont){
-        if((cola->comparador((*nodo)->entrada, (*padre)->entrada)) < 0){
-            TNodo aux = *nodo;
-            *nodo = *padre;
-            *padre = aux;
-            i = i/2;
-        }
-        else
-            cont = FALSE;
-        nodo = padre;
-        padre = &((*nodo)->padre);
+//HACER PRIVADO
+void burbujeoArriba(TColaCP cola, TNodo nodo){
+    if(cola.raiz != nodo){
+       TEntrada aux = nodo.entrada;
+       nodo.entrada = nodo.padre -> entrada;
+       nodo.padre -> entrada = aux;
+       burbujeoArriba(cola, *nodo.padre);
     }
 }
 
@@ -92,7 +62,6 @@ TColaCP crear_cola_cp(int (*f)(TEntrada, TEntrada)){
 }
 
 int cp_insertar(TColaCP cola, TEntrada entr){
-
     TNodo nuevoNodo = malloc(sizeof(struct nodo));
     nuevoNodo->entrada = entr;
 
@@ -137,13 +106,14 @@ int cp_insertar(TColaCP cola, TEntrada entr){
 
         nuevoNodo->padre = padre;
 
-        burbujeoArriba(cola, &nuevoNodo, &(nuevoNodo->padre));
+        if((cola->comparador(nuevoNodo.entrada, cola.raiz.entrada)) = TRUE)
+            burbujeoArriba(cola, nuevoNodo);
     }
     cola->cantidad_elementos++;
     return 1;
 }
 
-/* REVISAR
+
 TEntrada cp_eliminar(TColaCP cola){
     TEntrada aRetornar = cola->raiz->entrada;
 
@@ -152,28 +122,39 @@ TEntrada cp_eliminar(TColaCP cola){
         cola -> cantidad_elementos = 0;
     }
     else {
-        TNodo nuevaRaiz = encontrarUltimoNodo(cola->raiz);
-        TNodo hI = *(&(cola->raiz)*2);
-        TNodo hD = *(&(cola->raiz)*2 + sizeof(struct nodo))
-        hI.padre = nuevaRaiz;
-        hD.padre = nuevaRaiz;
-        cola -> raiz.entrada = ELE_NULO;
-        cola -> raiz.hijo_derecho = POS_NULA;
-        cola -> raiz.hijo_izquierdo = POS_NULA;
-        cola -> raiz = nuevaRaiz;
-        if(cola ->raiz.padre->hijo_derecho != POS_NULA)
-            cola ->raiz.padre->hijo_derecho = POS_NULA;
+        //BUCAMOS EL NODO QUE SERÁ NUESTRA NUEVA RAIZ (ultimo nodo insertado)
+        int i = 1;
+        int alt = (log(cola->cantidad_elementos + 1) / log(2));
+        while(i < alt){
+            i = i*2;
+        }
+        TNodo ultimoNodo = ELE_NULO;
+        if(cola->cantidad_elementos + 1 == i)
+            ultimoNodo = (insertarEnCompleto(cola->raiz));
+        else{
+            ultimoNodo = insertarEnNormal(cola->raiz, 0, alt);
+        }
+
+        //ASIGNAMOS NUESTRA NUEVA RAIZ Y ELIMINAMOS EL NODO QUE NOS SOBRA EN LA HEAP
+        cola->raiz->entrada = ultimoNodo.entrada;
+        ultimoNodo.entrada = ELE_NULO;
+        if(ultimoNodo.padre->hijo_derecho != POS_NULA)
+            ultimoNodo.padre->hijo_derecho = POS_NULA;
         else
-            cola ->raiz.padre->hijo_izquierdo = POS_NULA;
-        cola -> raiz.padre = POS_NULA;
+            ultimoNodo.padre->hijo_izquierdo = POS_NULA;
+        ultimoNodo.padre = POS_NULA;
+        free(sizeof(struct nodo));//PREGUNTAR SI SE HACE ACÁ O MAS ADELANTE
+        cola -> cantidad_elementos--;
 
-        //FALTA BURBUJEAR TODO.
-    }
+        //EVALUAMOS SI HAY QUE BURBUJEAR
+        TNodo nodoMenor = buscarMenor(cola, cola.raiz);
+        if((cola->comparador(nodoMenor.entrada, cola.raiz.entrada)) = TRUE)
+            burbujeoArriba(cola, nodoMenor);
 
-    free(sizeof(struct nodo));//PREGUNTAR SI SE HACE ACÁ O MAS ADELANTE
+        }
     return aRetornar;
 }
-*/
+
 
 int cp_cantidad(TColaCP cola){
     return cola->cantidad_elementos;
@@ -198,6 +179,43 @@ void cp_destruirRec(TNodo nodo, void(*fEliminar)(TEntrada)){
     fEliminar(nodo);
     free(nodo);
 }
+
+//HACER PRIVADO
+TNodo buscarMenor(TColaCP cola, TNodo nodo){
+    TNodo nEntradaMenor = nodo;
+    TNodo nMenorIzq = *nodo.hijo_izquierdo;
+    TNood nMenorDer = *nodo.hijo_derecho;
+
+    if(nMenorIzq != POS_NULA)
+        nMenorIzq = buscarMenorRecursivo(*nodo.hijo_izquierdo);
+    if(nMenorDer != POS_NULA)
+        nMenorDer = buscarMenorRecursivo(*nodo.hijo_derecho);
+
+    //CASO 1: TIENE LOS 2 HIJOS. HAY QUE COMPARAR LAS ENTRADAS ENTRE SI Y LUEGO COMPARAR CON LA DEL PADRE
+    if(nMenorDer != POS_NULA && nMenorIzq != POS_NULA){
+        TNodo menorHijo = POS_NULA;
+        if((cola.comparador(nMenorIzq.entrada, nMenorDer.entrada)) = TRUE)
+            menorHijo = nMenorIzq;
+        else
+            menorHijo = nMenorDer;
+
+        if((cola.comparador(menorHijo.entrada, nEntradaMenor.entrada)) = TRUE)
+            nEntradaMenor = menorHijo;
+    }
+    else{
+        //CASO 2: TIENE UN SOLO HIJO. HAY QUE COMPARAR LA ENTRADA DIRECTAMENTE CON LA DEL PADRE
+        if(nMenorIzq != POS_NULA){
+            if((cola.comparador(nMenorIzq.entrada, nEntradaMenor.entrada)) = TRUE)
+            nEntradaMenor = nMenorIzq;
+        }
+        if(nMenorDer != POS_NULA){
+            if((cola.comparador(nMenorDer.entrada, nEntradaMenor.entrada)) = TRUE)
+            nEntradaMenor = nMenorDer;
+        }
+    }
+    return nEntradaMenor;
+}
+
 
 
 
