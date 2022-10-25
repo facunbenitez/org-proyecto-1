@@ -65,7 +65,23 @@ TNodo insertarEnNormal (TNodo nodo, int nivel, int alt){
     return nodoAux;*/
 }
 
-
+//No funciona, preguntar
+void burbujeoArriba(TColaCP cola, TNodo *nodo,TNodo *padre){
+    int cont = TRUE;
+    int i = cola->cantidad_elementos;
+    while(i>1 && cont){
+        if((cola->comparador((*nodo)->entrada, (*padre)->entrada)) < 0){
+            TNodo aux = *nodo;
+            *nodo = *padre;
+            *padre = aux;
+            i = i/2;
+        }
+        else
+            cont = FALSE;
+        nodo = padre;
+        padre = &((*nodo)->padre);
+    }
+}
 
 TColaCP crear_cola_cp(int (*f)(TEntrada, TEntrada)){
     TColaCP nuevaCola = malloc(sizeof(struct cola_con_prioridad));
@@ -121,11 +137,7 @@ int cp_insertar(TColaCP cola, TEntrada entr){
 
         nuevoNodo->padre = padre;
 
-
-
-        if(cola->comparador(nuevoNodo->entrada, cola->raiz->entrada)){
-            //shellBurbuja(&cola->raiz);
-        }
+        burbujeoArriba(cola, &nuevoNodo, &(nuevoNodo->padre));
     }
     cola->cantidad_elementos++;
     return 1;
