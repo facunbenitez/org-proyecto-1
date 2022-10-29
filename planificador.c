@@ -3,6 +3,22 @@
 
 #include "colacp.h";
 
+typedef struct ciudad {
+    char * nombre;
+    float pos_x;
+    float pos_y;
+} * TCiudad;
+
+int distancia(TCiudad c1, TCiudad c2){
+    int x = c2->pos_x - c1->pos_x;
+    int y = c2->pos_y - c1->pos_y;
+    if(x<0)
+        x = x*-1;
+    if(y<0)
+        y = y*-1;
+    return x+y;
+}
+
 int compara(TEntrada e1, TEntrada e2){
     TClave clave1 = e1->clave;
     TClave clave2 = e2->clave;

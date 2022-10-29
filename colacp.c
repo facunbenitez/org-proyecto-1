@@ -109,7 +109,7 @@ int cantParaLlenar(TColaCP cola){
     ** 2^h = cant_elems + 1
     ** h = log2(cant_elems + 1) */
     int alt = (log(cola->cantidad_elementos + 1) / log(2));
-
+    //Esto solia ser un while pero note que no funcionaba como era debido asique lo cambie por un for.
     for(int j = 1; j<alt; j++){
         i = i*2;
     }
