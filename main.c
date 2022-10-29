@@ -7,7 +7,7 @@ int compara(TEntrada e1, TEntrada e2){
     TClave clave1 = e1->clave;
     TClave clave2 = e2->clave;
 
-    if(clave1 > clave2)
+    if(clave1 < clave2)
         return 1;
     else if(clave1 == clave2)
         return 0;
@@ -28,9 +28,11 @@ void recorridoInorden(TNodo nodo){
 
     }
 }
-
-int main()
+/*  argc = define la cantidad de parámetros por consola, más el nombre del programa
+    args = es el arreglo donde se encuentran todos los parámetros por consola         */
+int main(int argc, char ** args)
 {
+
     TColaCP cola = crear_cola_cp(compara);
     TEntrada e = malloc(sizeof(TEntrada));
     TEntrada e2 = malloc(sizeof(TEntrada));
@@ -41,17 +43,12 @@ int main()
     TEntrada e7 = malloc(sizeof(TEntrada));
     TEntrada e8 = malloc(sizeof(TEntrada));
 
-    e->clave = 100;
+    e->clave = 1;
     e->valor = 1;
 
     e2->clave = 2;
     e2->valor = 2;
 
-
-
-    cp_insertar(cola, e);
-    cp_insertar(cola, e2);
-/*
     e3->clave = 3;
     e3->valor = 3;
 
@@ -67,22 +64,30 @@ int main()
     e7->clave = 7;
     e7->valor = 7;
 
+
     e8->clave = 8;
     e8->valor = 8;
 
     cp_insertar(cola, e);
     cp_insertar(cola, e2);
+
     cp_insertar(cola, e3);
     cp_insertar(cola, e4);
     cp_insertar(cola, e5);
     cp_insertar(cola, e6);
     cp_insertar(cola, e7);
-    cp_insertar(cola, e8);*/
+
+
     printf("Raiz: %i\n", cola->raiz->entrada->clave);
     //printf("%i \n",cp_insertar(cola, e2));
     printf("Recorrido inorder: \n");
     recorridoInorden(cola->raiz);
 
+    printf("Elimino \n");
+    cp_eliminar(cola);
+
     printf("Cantidad de elementos: %i \n", cola->cantidad_elementos);
+
+    printf("Fin del programa\n");
     return 0;
 }
