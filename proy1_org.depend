@@ -1,10 +1,10 @@
 # depslib dependency file v1.0
-1667069448 source:d:\tarea\odc_2022\proyecto\proy1_org\main.c
+1667073371 source:d:\tarea\odc_2022\proyecto\proy1_org\main.c
 	<stdio.h>
 	<stdlib.h>
 	"colacp.h"
 
-1667069364 source:d:\tarea\odc_2022\proyecto\proy1_org\colacp.c
+1667073246 source:d:\tarea\odc_2022\proyecto\proy1_org\colacp.c
 	<stdio.h>
 	<stdlib.h>
 	"colacp.h"

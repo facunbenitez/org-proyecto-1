@@ -53,7 +53,6 @@ TNodo buscarMenor(TColaCP cola, TNodo nodo){
         nMenorIzq = insertarEnCompleto(nodo->hijo_izquierdo);
     if(nMenorDer != POS_NULA)
         nMenorDer = insertarEnCompleto(nodo->hijo_derecho);
-
     //CASO 1: TIENE LOS 2 HIJOS. HAY QUE COMPARAR LAS ENTRADAS ENTRE SI Y LUEGO COMPARAR CON LA DEL PADRE
     if(nMenorDer != POS_NULA && nMenorIzq != POS_NULA){
         TNodo menorHijo = POS_NULA;
@@ -127,6 +126,29 @@ TNodo buscarDerecha(TNodo n){
         return n;
 }
 
+//HACER PRIVADO
+TNodo buscarUltimoInsertado(TNodo nodo, int nivel, int alt){
+    TNodo toRet = POS_NULA;
+
+    if(nivel == alt){
+        if(nodo != POS_NULA)
+            return nodo;
+        else
+            return POS_NULA;
+    }
+    else{
+
+        TNodo izq = buscarUltimoInsertado(nodo->hijo_izquierdo, nivel+1, alt);
+        TNodo der = buscarUltimoInsertado(nodo->hijo_derecho, nivel+1, alt);
+
+        if(der == POS_NULA)
+            toRet = izq;
+        else
+            toRet = der;
+    }
+    return toRet;
+}
+
 int cp_insertar(TColaCP cola, TEntrada entr){
     TNodo nuevoNodo = malloc(sizeof(struct nodo));
     nuevoNodo->entrada = entr;
@@ -182,10 +204,14 @@ TEntrada cp_eliminar(TColaCP cola){
         if(cola->cantidad_elementos == cantParaLlenar(cola))
             ultimoNodo = (buscarDerecha(cola->raiz));
         else{
-            ultimoNodo = insertarEnNormal(cola->raiz, 0, altura(cola));
+            ultimoNodo = buscarUltimoInsertado(cola->raiz, 0, altura(cola));
+            if(ultimoNodo->hijo_derecho != POS_NULA)
+                ultimoNodo = ultimoNodo->hijo_derecho;
+            else if(ultimoNodo->hijo_izquierdo != POS_NULA)
+                ultimoNodo = ultimoNodo->hijo_izquierdo;
         }
 
-        printf("antes de borrar %d\n", ultimoNodo->entrada->clave);
+
         //ASIGNAMOS NUESTRA NUEVA RAIZ Y ELIMINAMOS EL NODO QUE NOS SOBRA EN LA HEAP
 
         cola->raiz->entrada = ultimoNodo->entrada;
@@ -197,13 +223,14 @@ TEntrada cp_eliminar(TColaCP cola){
         free(ultimoNodo);//PREGUNTAR SI SE HACE ACÁ O MAS ADELANTE
         cola -> cantidad_elementos--;
 
-        printf("antes de burbujear\n");
+        printf("ANTES de burbujear la raiz es %i\n", cola->raiz->entrada->clave);
         //EVALUAMOS SI HAY QUE BURBUJEAR
         TNodo nodoMenor = buscarMenor(cola, cola->raiz);
         if((cola->comparador(nodoMenor->entrada, cola->raiz->entrada)) == TRUE)
             burbujeoArriba(cola, nodoMenor);
 
         }
+        printf("DESPUES de burbujear la raiz es %i\n", cola->raiz->entrada->clave);
     return aRetornar;
 }
 

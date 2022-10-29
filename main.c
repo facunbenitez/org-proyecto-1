@@ -42,6 +42,7 @@ int main(int argc, char ** args)
     TEntrada e6 = malloc(sizeof(TEntrada));
     TEntrada e7 = malloc(sizeof(TEntrada));
     TEntrada e8 = malloc(sizeof(TEntrada));
+    TEntrada e9 = malloc(sizeof(TEntrada));
 
     e->clave = 1;
     e->valor = 1;
@@ -64,9 +65,11 @@ int main(int argc, char ** args)
     e7->clave = 7;
     e7->valor = 7;
 
-
     e8->clave = 8;
     e8->valor = 8;
+
+    e9->clave = 9;
+    e9->valor = 9;
 
     cp_insertar(cola, e);
     cp_insertar(cola, e2);
@@ -74,8 +77,11 @@ int main(int argc, char ** args)
     cp_insertar(cola, e3);
     cp_insertar(cola, e4);
     cp_insertar(cola, e5);
+
     cp_insertar(cola, e6);
     cp_insertar(cola, e7);
+    cp_insertar(cola, e8);
+    cp_insertar(cola, e9);
 
 
     printf("Raiz: %i\n", cola->raiz->entrada->clave);
@@ -83,11 +89,15 @@ int main(int argc, char ** args)
     printf("Recorrido inorder: \n");
     recorridoInorden(cola->raiz);
 
-    printf("Elimino \n");
-    cp_eliminar(cola);
+    for(int i = 0; i<3; i++){
+        printf("\n");
+        cp_eliminar(cola);
 
-    printf("Cantidad de elementos: %i \n", cola->cantidad_elementos);
+        printf("La raiz ACTUAL es: %i\n", cola->raiz->entrada->clave);
+        printf("Cantidad de elementos: %i \n", cola->cantidad_elementos);
 
+        recorridoInorden(cola->raiz);
+    }
     printf("Fin del programa\n");
     return 0;
 }
