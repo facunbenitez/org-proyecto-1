@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "colacp.h"
+#include <math.h>
 
 const int TRUE = 1;
 const int FALSE = 0;
@@ -26,7 +27,7 @@ TNodo insertarEnNormal (TNodo nodo, int nivel, int alt){
         if(nodo->hijo_izquierdo == POS_NULA || nodo->hijo_derecho == POS_NULA)
             return nodo;
         else
-            return POS_NULA;
+            return (TNodo) POS_NULA;
     }
 
     //Caso rec., No estoy en el nivel de insercion.
@@ -55,7 +56,7 @@ TNodo buscarMenor(TColaCP cola, TNodo nodo){
         nMenorDer = insertarEnCompleto(nodo->hijo_derecho);
     //CASO 1: TIENE LOS 2 HIJOS. HAY QUE COMPARAR LAS ENTRADAS ENTRE SI Y LUEGO COMPARAR CON LA DEL PADRE
     if(nMenorDer != POS_NULA && nMenorIzq != POS_NULA){
-        TNodo menorHijo = POS_NULA;
+        TNodo menorHijo = (TNodo)POS_NULA;
         if((cola->comparador(nMenorIzq->entrada, nMenorDer->entrada)) == TRUE)
             menorHijo = nMenorIzq;
         else
@@ -92,7 +93,7 @@ TColaCP crear_cola_cp(int (*f)(TEntrada, TEntrada)){
     TColaCP nuevaCola = malloc(sizeof(struct cola_con_prioridad));
     nuevaCola->cantidad_elementos = 0;
     nuevaCola->comparador = *f;
-    nuevaCola->raiz = POS_NULA;
+    nuevaCola->raiz = (TNodo)POS_NULA;
     return nuevaCola;
 }
 
@@ -128,13 +129,13 @@ TNodo buscarDerecha(TNodo n){
 
 //HACER PRIVADO
 TNodo buscarUltimoInsertado(TNodo nodo, int nivel, int alt){
-    TNodo toRet = POS_NULA;
+    TNodo toRet = (TNodo)POS_NULA;
 
     if(nivel == alt){
         if(nodo != POS_NULA)
             return nodo;
         else
-            return POS_NULA;
+            return (TNodo)POS_NULA;
     }
     else{
 
@@ -153,8 +154,8 @@ int cp_insertar(TColaCP cola, TEntrada entr){
     TNodo nuevoNodo = malloc(sizeof(struct nodo));
     nuevoNodo->entrada = entr;
 
-    nuevoNodo->hijo_izquierdo = POS_NULA;
-    nuevoNodo->hijo_derecho = POS_NULA;
+    nuevoNodo->hijo_izquierdo = (TNodo)POS_NULA;
+    nuevoNodo->hijo_derecho = (TNodo)POS_NULA;
 
     //Inserto raiz, si no existe una
     if(cola->raiz==POS_NULA)
@@ -164,7 +165,7 @@ int cp_insertar(TColaCP cola, TEntrada entr){
     else {
 
         //Ubico el padre de mi nuevo nodo en funcion del estado de mi heap
-        TNodo padre = POS_NULA;
+        TNodo padre = (TNodo)POS_NULA;
         if(cantParaLlenar(cola)==cola->cantidad_elementos){
             padre = (insertarEnCompleto(cola->raiz));
             padre->hijo_izquierdo = nuevoNodo;
@@ -194,13 +195,13 @@ TEntrada cp_eliminar(TColaCP cola){
     TEntrada aRetornar = cola->raiz->entrada;
 
     if(cola -> cantidad_elementos == 1){
-        cola -> raiz = ELE_NULO;
+        cola -> raiz = (TNodo)POS_NULA;
         cola -> cantidad_elementos = 0;
     }
     else {
         //BUCAMOS EL NODO QUE SERÁ NUESTRA NUEVA RAIZ (ultimo nodo insertado)
 
-        TNodo ultimoNodo = POS_NULA;
+        TNodo ultimoNodo = (TNodo)POS_NULA;
         if(cola->cantidad_elementos == cantParaLlenar(cola))
             ultimoNodo = (buscarDerecha(cola->raiz));
         else{
@@ -215,11 +216,11 @@ TEntrada cp_eliminar(TColaCP cola){
         //ASIGNAMOS NUESTRA NUEVA RAIZ Y ELIMINAMOS EL NODO QUE NOS SOBRA EN LA HEAP
 
         cola->raiz->entrada = ultimoNodo->entrada;
-        ultimoNodo->entrada = ELE_NULO;
+        ultimoNodo->entrada = (TEntrada)ELE_NULO;
         if(ultimoNodo->padre->hijo_derecho != POS_NULA)
-            ultimoNodo->padre->hijo_derecho = POS_NULA;
+            ultimoNodo->padre->hijo_derecho = (TNodo)POS_NULA;
         else
-            ultimoNodo->padre->hijo_izquierdo = POS_NULA;
+            ultimoNodo->padre->hijo_izquierdo = (TNodo)POS_NULA;
         free(ultimoNodo);//PREGUNTAR SI SE HACE ACÁ O MAS ADELANTE
         cola -> cantidad_elementos--;
 
@@ -239,25 +240,40 @@ int cp_cantidad(TColaCP cola){
     return cola->cantidad_elementos;
 }
 
+//Declarar privado
+void cp_destruirRec(TNodo nodo, void(*fEliminar)(TEntrada)){
+
+    TNodo hijoIzq = nodo->hijo_izquierdo;
+    TNodo hijoDer = nodo->hijo_derecho;
+
+    fEliminar(nodo->entrada);
+    free(nodo);
+
+    if(hijoIzq != POS_NULA)
+        cp_destruirRec(hijoIzq,fEliminar);
+    if(hijoDer != POS_NULA)
+        cp_destruirRec(hijoDer,fEliminar);
+
+
+}
+
 void cp_destruir(TColaCP cola, void (*fEliminar)(TEntrada)){
-    if(cola->raiz->hijo_izquierdo != POS_NULA)
-        cp_destruirRec(cola->raiz->hijo_izquierdo, fEliminar);
-    if(cola->raiz->hijo_derecho != POS_NULA)
-        cp_destruirRec(cola->raiz->hijo_derecho,fEliminar);
-    fEliminar(cola->raiz);
+    TNodo hijoIzq = cola->raiz->hijo_izquierdo;
+    TNodo hijoDer = cola->raiz->hijo_derecho;
+
+    fEliminar(cola->raiz->entrada);
     free(cola->raiz);
+
+    if(hijoIzq != POS_NULA)
+        cp_destruirRec(hijoIzq, fEliminar);
+
+    if(hijoDer != POS_NULA)
+        cp_destruirRec(hijoDer,fEliminar);
+
     free(cola);
 }
 
-//Declarar privado
-void cp_destruirRec(TNodo nodo, void(*fEliminar)(TEntrada)){
-    if(nodo->hijo_izquierdo != POS_NULA)
-        cp_destruirRec(nodo->hijo_izquierdo,fEliminar);
-    if(nodo->hijo_derecho != POS_NULA)
-        cp_destruirRec(nodo->hijo_derecho,fEliminar);
-    fEliminar(nodo);
-    free(nodo);
-}
+
 
 
 
