@@ -89,14 +89,6 @@ void burbujeoArriba(TColaCP cola, TNodo nodo){
     }
 }
 
-TColaCP crear_cola_cp(int (*f)(TEntrada, TEntrada)){
-    TColaCP nuevaCola = malloc(sizeof(struct cola_con_prioridad));
-    nuevaCola->cantidad_elementos = 0;
-    nuevaCola->comparador = *f;
-    nuevaCola->raiz = (TNodo)POS_NULA;
-    return nuevaCola;
-}
-
 //HACER PRIVADO
 int altura(TColaCP cola){
     return (log(cola->cantidad_elementos + 1) / log(2));
@@ -150,7 +142,35 @@ TNodo buscarUltimoInsertado(TNodo nodo, int nivel, int alt){
     return toRet;
 }
 
+//HACER PRIVADO
+void cp_destruirRec(TNodo nodo, void(*fEliminar)(TEntrada)){
+
+    TNodo hijoIzq = nodo->hijo_izquierdo;
+    TNodo hijoDer = nodo->hijo_derecho;
+
+    fEliminar(nodo->entrada);
+    free(nodo);
+
+    if(hijoIzq != POS_NULA)
+        cp_destruirRec(hijoIzq,fEliminar);
+    if(hijoDer != POS_NULA)
+        cp_destruirRec(hijoDer,fEliminar);
+
+
+}
+
+TColaCP crear_cola_cp(int (*f)(TEntrada, TEntrada)){
+    TColaCP nuevaCola = malloc(sizeof(struct cola_con_prioridad));
+    nuevaCola->cantidad_elementos = 0;
+    nuevaCola->comparador = *f;
+    nuevaCola->raiz = (TNodo)POS_NULA;
+    return nuevaCola;
+}
+
 int cp_insertar(TColaCP cola, TEntrada entr){
+    if(cola == NULL)
+        exit(CCP_NO_INI);
+
     TNodo nuevoNodo = malloc(sizeof(struct nodo));
     nuevoNodo->entrada = entr;
 
@@ -192,6 +212,9 @@ int cp_insertar(TColaCP cola, TEntrada entr){
 
 
 TEntrada cp_eliminar(TColaCP cola){
+    if(cola == NULL)
+        exit(CCP_NO_INI);
+
     TEntrada aRetornar = cola->raiz->entrada;
 
     if(cola -> cantidad_elementos == 1){
@@ -224,40 +247,26 @@ TEntrada cp_eliminar(TColaCP cola){
         free(ultimoNodo);//PREGUNTAR SI SE HACE ACÁ O MAS ADELANTE
         cola -> cantidad_elementos--;
 
-        printf("ANTES de burbujear la raiz es %i\n", cola->raiz->entrada->clave);
         //EVALUAMOS SI HAY QUE BURBUJEAR
         TNodo nodoMenor = buscarMenor(cola, cola->raiz);
         if((cola->comparador(nodoMenor->entrada, cola->raiz->entrada)) == TRUE)
             burbujeoArriba(cola, nodoMenor);
 
         }
-        printf("DESPUES de burbujear la raiz es %i\n", cola->raiz->entrada->clave);
     return aRetornar;
 }
 
 
 int cp_cantidad(TColaCP cola){
+    if(cola == NULL)
+        exit(CCP_NO_INI);
     return cola->cantidad_elementos;
 }
 
-//Declarar privado
-void cp_destruirRec(TNodo nodo, void(*fEliminar)(TEntrada)){
-
-    TNodo hijoIzq = nodo->hijo_izquierdo;
-    TNodo hijoDer = nodo->hijo_derecho;
-
-    fEliminar(nodo->entrada);
-    free(nodo);
-
-    if(hijoIzq != POS_NULA)
-        cp_destruirRec(hijoIzq,fEliminar);
-    if(hijoDer != POS_NULA)
-        cp_destruirRec(hijoDer,fEliminar);
-
-
-}
-
 void cp_destruir(TColaCP cola, void (*fEliminar)(TEntrada)){
+    if(cola == NULL)
+        exit(CCP_NO_INI);
+
     TNodo hijoIzq = cola->raiz->hijo_izquierdo;
     TNodo hijoDer = cola->raiz->hijo_derecho;
 
@@ -272,6 +281,10 @@ void cp_destruir(TColaCP cola, void (*fEliminar)(TEntrada)){
 
     free(cola);
 }
+
+
+
+
 
 
 

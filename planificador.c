@@ -19,6 +19,8 @@ int distancia(TCiudad c1, TCiudad c2){
     return x+y;
 }
 
+//SI SE USA PARA COLAMIN, LA CLAVE DE UNA ENTRADA REPRESENTA LA DISTANCIA AL ORIGEN, Y SU VALOR LA CIUDAD
+//SI SE USA PARA COLAREDUCIRHORAS, LA CLAVE DE UNA ENTRADA REPRESENTA LA DISTANCIA A LA CIUDAD ACTUAL, Y SU VALOR LA CIUDAD
 int comparadorMin(TEntrada e1, TEntrada e2){
     TClave clave1 = e1->clave;
     TClave clave2 = e2->clave;
@@ -30,6 +32,8 @@ int comparadorMin(TEntrada e1, TEntrada e2){
     else
         return -1;
 }
+
+//LA CLAVE DE UNA ENTRADA REPRESENTA LA DISTANCIA AL ORIGEN, Y SU VALOR LA CIUDAD
 int comparadorMax(TEntrada e1, TEntrada e2){
     TClave clave1 = e1->clave;
     TClave clave2 = e2->clave;
@@ -42,21 +46,10 @@ int comparadorMax(TEntrada e1, TEntrada e2){
         return -1;
 }
 
-void recorridoInorden(TNodo nodo){
-    if(nodo!=ELE_NULO){
-
-        if(nodo->hijo_izquierdo!=ELE_NULO)
-            recorridoInorden(nodo->hijo_izquierdo);
-
-        printf("%d %d \n",(int*)nodo->entrada->clave, (int*)nodo->entrada->valor);
-
-        if(nodo->hijo_derecho!=ELE_NULO)
-            recorridoInorden(nodo->hijo_derecho);
-
-    }
-}
-
+///PREGUTNAR SI HACE FALTA HACER FREE DE CLAVE Y VALOR (CREEMOS QUE NO)
 void eliminarEntrada(TEntrada e){
+    e->clave = ELE_NULO;
+    e->valor = ELE_NULO;
     free(e);
 }
 /*  argc = define la cantidad de parámetros por consola, más el nombre del programa
@@ -65,74 +58,84 @@ int main(int argc, char ** args)
 {
     //printf("Contenido texto: %s", args[1][0]);
 
-    TColaCP cola = crear_cola_cp(comparadorMin);
-    TEntrada e = malloc(sizeof(TEntrada));
-    TEntrada e2 = malloc(sizeof(TEntrada));
-    TEntrada e3 = malloc(sizeof(TEntrada));
-    TEntrada e4 = malloc(sizeof(TEntrada));
-    TEntrada e5 = malloc(sizeof(TEntrada));
-    TEntrada e6 = malloc(sizeof(TEntrada));
-    TEntrada e7 = malloc(sizeof(TEntrada));
-    TEntrada e8 = malloc(sizeof(TEntrada));
-    TEntrada e9 = malloc(sizeof(TEntrada));
+    TColaCP colaMin = crear_cola_cp(comparadorMin);
+    TColaCP colaMax = crear_cola_cp(comparadorMax);
+    TColaCP colaReducirHoras = crear_cola_cp(comparadorMin);
 
-    e->clave = (int*)1;
-    e->valor = (int*)1;
+    //Empieza como el 1er valor que levantamos del archivo de texto, cambia en la 3er cola recien
+    TCiudad ubicacionActual;
+    int horasDeManejo = 0;
+    /*
+        Levantamos el archivo de texto
+        asignamos ubicacionActual
+        para cada posicion del arreglo (a partir de la 2da)
+            creamos una entrada del tipo <Distancia al origen, ciudad>*/
+            cp_insertar(colaMin, nuevaEntrada);
+            cp_insertar(colaMax, nuevaEntrada);
+            cp_insertar(colaReducirHoras, nuevaEntrada);
 
-    e2->clave = (int*)2;
-    e2->valor = (int*)2;
+        int op0 = 0;
 
-    e3->clave = (int*)3;
-    e3->valor = (int*)3;
+        while(op0 == 0){
+        //Preguntamos al usuario que quiere hacer
 
-    e4->clave = (int*)4;
-    e4->valor = (int*)4;
+            if(/*Ingresar 0 si quiere terminar la ejecucion*/){
+                if(colaMin != NULL)
+                    cp_destruir(colaMin, eliminarEntrada);
+                if(colaMax != NULL)
+                    cp_destruir(colaMax, eliminarEntrada);
+                if(colaReducirHoras != NULL)
+                    cp_destruir(colaReducirHoras, eliminarEntrada);
+                op0++;
+                printf("Fin de la ejecucion \n");
+            }
 
-    e5->clave = (int*)5;
-    e5->valor = (int*)5;
+            if(/*Ingresar 1 si quiere ver ascendente*/){
+            if(colaMin == NULL)
+                printf("Esta operacion ya se ejecuto previamente \n");
+            else{
+                printf("Mostrar ascendente: \n");
+                while(colaMin -> cantidad_elementos != 0){
+                    TEntrada actual = cp_eliminar(colaMin);
+                    printf("%s \n", *(actual->valor->nombre));
+                }
+                cp_destruir(colaMin, eliminarEntrada);
+            }
+            }
 
-    e6->clave = (int*)6;
-    e6->valor = (int*)6;
+           if(/*Ingresar 2 si quiere ver descendente*/){
+           if(colaMax == NULL)
+                printf("Esta operacion ya se ejecuto previamente \n");
+            else{
+                printf("Mostrar descendente: \n");
+                while(colaMax ->cantidad_elementos != 0){
+                    TEntrada actual = cp_eliminar(colaMax);
+                    printf("%s \n", *(actual->valor->nombre));
+                }
+                cp_destruir(colaMax, eliminarEntrada);
+            }
+           }
 
-    e7->clave = (int*)7;
-    e7->valor = (int*)7;
+            if(/*Ingresar 3 si quiere reducir horas de manejo*/){
+            if(colaReducirHoras == NULL)
+                printf("Esta operacion ya se ejecuto previamente \n");
+            else{
+                printf("Mostrar descendente: \n");
+                while(colaReducirHoras ->cantidad_elementos != 0){
+                    TEntrada actual = cp_eliminar(colaReducirHoras);
+                    printf("%s \n", *(actual->valor->nombre));
+                    horasDeManejo = horasDeManejo + actual.clave;
+                    ubicacionActual = actual;
+                    /*  y para cada elemento de la cola, calculamos su distancia con la nueva ubicacion e insertamos en colalAUX (Hacer malloc correspondientes)
+                        colaReducirHoras = colaAUX
+                        removemos todos los elementos de colaAUX, pero no la destruimos*/
+                }
+                cp_destruir(colaReducirHoras, eliminarEntrada);
+            }
+            }
+        }
+    ///PREGUNTAR COMO FUNCIONA EL LEVANTAR LOS ARCHIVOS DE TEXTO
+    ///PREGUNTAR SI PODEMOS HACER BURBUJEO POR FUERA DEL TDA
 
-    e8->clave = (int*)8;
-    e8->valor = (int*)8;
-
-    e9->clave = (int*)9;
-    e9->valor = (int*)9;
-
-    cp_insertar(cola, e);
-    cp_insertar(cola, e2);
-
-    cp_insertar(cola, e3);
-    cp_insertar(cola, e4);
-    cp_insertar(cola, e5);
-
-    cp_insertar(cola, e6);
-    cp_insertar(cola, e7);
-    cp_insertar(cola, e8);
-    cp_insertar(cola, e9);
-
-
-    printf("La raiz ACTUAL es: %i\n", cola->raiz->entrada->clave);
-    //printf("%i \n",cp_insertar(cola, e2));
-    printf("Recorrido inorder: \n");
-    recorridoInorden(cola->raiz);
-
-    for(int i = 0; i<3; i++){
-        printf("\n");
-        cp_eliminar(cola);
-
-        printf("La raiz ACTUAL es: %i\n", cola->raiz->entrada->clave);
-        printf("Cantidad de elementos: %i \n", cola->cantidad_elementos);
-
-        recorridoInorden(cola->raiz);
-    }
-
-    cp_destruir(cola, eliminarEntrada);
-
-    printf("Fin del programa\n");
     return 0;
 }
