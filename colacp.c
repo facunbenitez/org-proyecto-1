@@ -10,7 +10,7 @@ const int CCP_NO_INI = 2;
 const void* POS_NULA = NULL;
 const void* ELE_NULO = NULL;
 
-//HACER PRIVADO
+//FUNCIÓN PRIVADA
 TNodo insertarEnCompleto (TNodo nodo){
     TNodo nuevoNodo = nodo;
     if(nodo->hijo_izquierdo != POS_NULA)
@@ -18,7 +18,7 @@ TNodo insertarEnCompleto (TNodo nodo){
     return nuevoNodo;
 }
 
-//HACER PRIVADO
+//FUNCIÓN PRIVADA
 TNodo insertarEnNormal (TNodo nodo, int nivel, int alt){
     //Caso base, estoy en el nivel de insercion.
     //Si uno de los hijos del nodo es POS_NULA, retorno ese nodo
@@ -44,7 +44,7 @@ TNodo insertarEnNormal (TNodo nodo, int nivel, int alt){
     }
 }
 
-//HACER PRIVADO
+//METODO PRIVADO
 TNodo buscarMenor(TColaCP cola, TNodo nodo){
     TNodo nEntradaMenor = nodo;
     TNodo nMenorIzq = nodo->hijo_izquierdo;
@@ -79,7 +79,7 @@ TNodo buscarMenor(TColaCP cola, TNodo nodo){
     return nEntradaMenor;
 }
 
-//HACER PRIVADO
+//FUNCIÓN PRIVADA
 void burbujeoArriba(TColaCP cola, TNodo nodo){
     if(cola->raiz != nodo){
        TEntrada aux = nodo->entrada;
@@ -89,12 +89,12 @@ void burbujeoArriba(TColaCP cola, TNodo nodo){
     }
 }
 
-//HACER PRIVADO
+//METODO PRIVADO
 int altura(TColaCP cola){
     return (log(cola->cantidad_elementos + 1) / log(2));
 }
 
-//HACER PRIVADO
+//METODO PRIVADO
 int cantParaLlenar(TColaCP cola){
     int i = 2;
     /* ECUACION PARA HALLAR LA ALTURA
@@ -102,7 +102,6 @@ int cantParaLlenar(TColaCP cola){
     ** 2^h = cant_elems + 1
     ** h = log2(cant_elems + 1) */
     int alt = (log(cola->cantidad_elementos + 1) / log(2));
-    //Esto solia ser un while pero note que no funcionaba como era debido asique lo cambie por un for.
     for(int j = 1; j<alt; j++){
         i = i*2;
     }
@@ -111,7 +110,7 @@ int cantParaLlenar(TColaCP cola){
     return i;
 }
 
-//HACER PRIVADO
+//FUNCIÓN PRIVADA
 TNodo buscarDerecha(TNodo n){
     if(n->hijo_derecho != POS_NULA)
         return buscarDerecha(n->hijo_derecho);
@@ -119,7 +118,7 @@ TNodo buscarDerecha(TNodo n){
         return n;
 }
 
-//HACER PRIVADO
+//FUNCIÓN PRIVADA
 TNodo buscarUltimoInsertado(TNodo nodo, int nivel, int alt){
     TNodo toRet = (TNodo)POS_NULA;
 
@@ -142,7 +141,7 @@ TNodo buscarUltimoInsertado(TNodo nodo, int nivel, int alt){
     return toRet;
 }
 
-//HACER PRIVADO
+//FUNCIÓN PRIVADA
 void cp_destruirRec(TNodo nodo, void(*fEliminar)(TEntrada)){
 
     TNodo hijoIzq = nodo->hijo_izquierdo;
@@ -278,7 +277,6 @@ void cp_destruir(TColaCP cola, void (*fEliminar)(TEntrada)){
 
     if(hijoDer != POS_NULA)
         cp_destruirRec(hijoDer,fEliminar);
-
     free(cola);
 }
 
