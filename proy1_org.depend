@@ -4,7 +4,7 @@
 	<stdlib.h>
 	"colacp.h"
 
-1667079359 source:d:\tarea\odc_2022\proyecto\proy1_org\colacp.c
+1667429252 source:d:\tarea\odc_2022\proyecto\proy1_org\colacp.c
 	<stdio.h>
 	<stdlib.h>
 	"colacp.h"
@@ -12,9 +12,10 @@
 
 1666209692 d:\tarea\odc_2022\proyecto\proy1_org\colacp.h
 
-1667080539 source:d:\tarea\odc_2022\proyecto\proy1_org\planificador.c
+1667429551 source:d:\tarea\odc_2022\proyecto\proy1_org\planificador.c
 	<stdio.h>
 	<stdlib.h>
+	<string.h>
 	"colacp.h"
 
 1667417345 source:c:\users\facub\desktop\ides y apps\material codeblocks\a\org-proyecto-1\colacp.c

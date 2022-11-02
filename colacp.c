@@ -106,7 +106,6 @@ int cantParaLlenar(TColaCP cola){
         i = i*2;
     }
     i--;
-    printf("Altura: %d, i: %d, cantidad_elems: %d\n", alt, i, cola->cantidad_elementos);
     return i;
 }
 
@@ -266,17 +265,23 @@ void cp_destruir(TColaCP cola, void (*fEliminar)(TEntrada)){
     if(cola == NULL)
         exit(CCP_NO_INI);
 
-    TNodo hijoIzq = cola->raiz->hijo_izquierdo;
-    TNodo hijoDer = cola->raiz->hijo_derecho;
+    if(cola->raiz!=POS_NULA){
 
-    fEliminar(cola->raiz->entrada);
-    free(cola->raiz);
+        TNodo hijoIzq = cola->raiz->hijo_izquierdo;
+        TNodo hijoDer = cola->raiz->hijo_derecho;
 
-    if(hijoIzq != POS_NULA)
-        cp_destruirRec(hijoIzq, fEliminar);
+        fEliminar(cola->raiz->entrada);
 
-    if(hijoDer != POS_NULA)
-        cp_destruirRec(hijoDer,fEliminar);
+        free(cola->raiz);
+
+        if(hijoIzq != POS_NULA)
+            cp_destruirRec(hijoIzq, fEliminar);
+
+        if(hijoDer != POS_NULA)
+            cp_destruirRec(hijoDer,fEliminar);
+
+    }
+
     free(cola);
 }
 
