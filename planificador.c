@@ -53,9 +53,10 @@ void noEliminarEntrada(TEntrada e){
 
 int main(int argc, char * args[]){
 
-    TCiudad ubicacionActual;
+    TCiudad ubicacionActual = malloc(sizeof(ubicacionActual));
     TEntrada entradas[100];
     TEntrada entradasRH[100];
+    ///HAY QUE HACER MALLOC DE LOS ARREGLOS? PROBLEMAS A LA HORA DE HACER FREE
 
     FILE * archivo;
     archivo = fopen(args[1], "r");
@@ -63,15 +64,21 @@ int main(int argc, char * args[]){
         perror("Se ingreso un archivo nulo");
         exit(-1);
     }
+
     char cadena[300];
-    fscanf(archivo, %s, cadena); ///CONSULTAR SI ES LO MEJOR O SI DEBERIAMOS USAR OTRA FUNCION
+    fscanf(archivo, "%s", cadena); ///CONSULTAR SI ES LO MEJOR O SI DEBERIAMOS USAR OTRA FUNCION
     char delimitador[] = ";\n";
     char * token = strtok(cadena, delimitador);
-    TCiudad aux;
+    TCiudad aux = malloc(sizeof(aux));
+    TCiudad aux2 = malloc(sizeof(aux2));
     ubicacionActual -> pos_x = -1;
     ubicacionActual-> pos_y = -1;
+    aux -> nombre = NULL;
     aux -> pos_x = -1;
     aux -> pos_y = -1;
+    aux2 -> nombre = NULL;
+    aux2 -> pos_x = -1;
+    aux2 -> pos_y = -1;
     int indice = 0;
 
     if(token!= NULL){
@@ -97,18 +104,15 @@ int main(int argc, char * args[]){
                             aux->pos_y = atoi(token);
                             //Una vez que seteamos todos los valores de una ciudad, creamos la
                             //entrada y la ubicamos en las colecciones de entradas.
-                            ///FALTA VER MANEJO DE MEMORIA
-                            TEntrada eAux;
-                            TEntrada eAuxRH;
+                            TEntrada eAux = malloc(sizeof(eAux));
+                            TEntrada eAuxRH = malloc(sizeof(eAuxRH));
                             eAux->clave = (int) distancia(ubicacionActual, aux);
                             eAuxRH->clave = (int) distancia(ubicacionActual, aux);
                             eAux->valor = aux;
                             eAuxRH->valor = aux;
                             entradas[indice] = eAux;
+                            entradasRH[indice] = eAuxRH;
                             indice++;
-                            TCiudad aux2;
-                            aux2->pos_x = -1;
-                            aux2->pos_y = -1;
                             aux = aux2;
                         }
                     }
@@ -125,15 +129,17 @@ int main(int argc, char * args[]){
     printf("Si desea mostrar ascendente, inserte 1 \n");
     printf("Si desea mostrar descendente, inserte 2 \n");
     printf("Si desea reducir horas de manejo, inserte 3 \n");
+
+    TColaCP colaMin;
+    TColaCP colaMax;
+    TColaCP colaReducirHoras;
+    int opcion = -1;
+
         while(op0 == 0){
         printf("Indique la opcion deseada: ");
-        int opcion = -1
-        scanf(); //Hay que hacerlo
+        scanf("%i", &opcion );
         printf("\n");
 
-        TColaCP colaMin;
-        TColaCP colaMax;
-        TColaCP colaReducirHoras;
 
             if(opcion == 0){
                 if(colaMin != NULL){
@@ -162,7 +168,7 @@ int main(int argc, char * args[]){
                 printf("Mostrar ascendente: \n");
                 while(colaMin -> cantidad_elementos != 0){
                     TEntrada actual = cp_eliminar(colaMin);
-                    printf("%s \n", *actual->valor->nombre);
+                    printf("%s \n", ((TCiudad) actual->valor)->nombre);
                 }
                 cp_destruir(colaMin, noEliminarEntrada);
                 colaMin = NULL;
@@ -179,7 +185,7 @@ int main(int argc, char * args[]){
                 printf("Mostrar descendente: \n");
                 while(colaMax ->cantidad_elementos != 0){
                     TEntrada actual = cp_eliminar(colaMax);
-                    printf("%s \n", *(actual->valor->nombre));
+                    printf("%s \n", ((TCiudad) actual->valor)->nombre);
                 }
                 cp_destruir(colaMax, noEliminarEntrada);
                 colaMax = NULL;
@@ -196,18 +202,42 @@ int main(int argc, char * args[]){
                 printf("Mostrar descendente: \n");
                 while(colaReducirHoras ->cantidad_elementos != 0){
                     TEntrada actual = cp_eliminar(colaReducirHoras);
-                    printf("%s \n", *(actual->valor->nombre));
+                    printf("%s \n", ((TCiudad) actual->valor)->nombre);
                     horasDeManejo = horasDeManejo + actual->clave;
-                    ubicacionActual = actual;
-                    /*  y para cada elemento de la cola, calculamos su distancia con la nueva ubicacion e insertamos en colalAUX (Hacer malloc correspondientes)
-                        colaReducirHoras = colaAUX
-                        removemos todos los elementos de colaAUX, pero no la destruimos*/
+                    ubicacionActual = (TCiudad) actual->valor;
+                    while(cp_cantidad(colaReducirHoras) != 0)
+                        cp_eliminar(colaReducirHoras);
+                    for(int i = 0; i<indice; i++){
+                        if(entradasRH[i]->valor == ubicacionActual){
+                            free(entradasRH[i]->clave);
+                            free(entradasRH[i]);
+                            entradasRH[i] = NULL;
+                        }
+                        if(entradasRH[i] != NULL){
+                            entradasRH[i] -> clave = (int) distancia(ubicacionActual, aux);
+                        }
+                    }
+                    for(int i = 0; i<indice; i++){
+                        if(entradasRH[i] != NULL){
+                            cp_insertar(colaReducirHoras, entradasRH[i]);
+                        }
+                    }
                 }
                 cp_destruir(colaReducirHoras, noEliminarEntrada);
-                colaReducirHoras == NULL;
+                colaReducirHoras = NULL;
             }
             }
         }
+        free(ubicacionActual);
+        free(aux2);
+        free(aux);
+        ///PREGUNTAR SI HAY QUE HACER FREE DE ENTRADASRH (Problemas de referencias)
+        for(int j = 0; j<indice; j++){
+            free(entradas[j]->clave);
+            free(entradas[j]->valor);
+            free(entradas[j]);
+        }
+        ///PREGUNTAR ERRORES RELATIVOS A TCLAVE A LA HORA DE ASIGNARLO
 
     return 0;
 }
