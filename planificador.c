@@ -67,7 +67,8 @@ int main(int argc, char * args[]){
 
     char cadena[300] = "1;1\nSaliquelo;2;2\nBahia Blanca;4;4\nTrenque Lauquen;4;0\nCarhue;0;3";
     printf("La cadena es: [ %s ]\n", cadena);
-    //fscanf(archivo, "%s", cadena); ///CONSULTAR SI ES LO MEJOR O SI DEBERIAMOS USAR OTRA FUNCION
+    //fscanf(archivo, "%s", cadena);
+    ///CONSULTAR SI ES LO MEJOR O SI DEBERIAMOS USAR OTRA FUNCION
     char delimitador[] = ";\n";
     char * token = strtok(cadena, delimitador);
 
@@ -133,7 +134,6 @@ int main(int argc, char * args[]){
 
             token = strtok(NULL, delimitador);
         }
-        free(aux);
     }
     printf("Ub actual: %f, %f\n", ubicacionActual->pos_x, ubicacionActual->pos_y);
     for(int i = 0; i<indice; i++){
@@ -141,11 +141,11 @@ int main(int argc, char * args[]){
     }
     int horasDeManejo = 0;
     int op0 = 0;
-    /*printf("Si desea finalizar la ejecucion, inserte 0 \n");
+    printf("Si desea finalizar la ejecucion, inserte 0 \n");
     printf("Si desea mostrar ascendente, inserte 1 \n");
     printf("Si desea mostrar descendente, inserte 2 \n");
     printf("Si desea reducir horas de manejo, inserte 3 \n");
-*/
+
     TColaCP colaMin = crear_cola_cp(comparadorMin);
     TColaCP colaMax = crear_cola_cp(comparadorMax);
     TColaCP colaReducirHoras = crear_cola_cp(comparadorMin);
@@ -242,13 +242,14 @@ int main(int argc, char * args[]){
                             }
                         }
                     }
-                    printf("Total recorrido %i", horasDeManejo);
+                    printf("Total recorrido %i \n", horasDeManejo);
                     cp_destruir(colaReducirHoras, noEliminarEntrada);
                     colaReducirHoras = NULL;
                 }
             }
         }
         free(ubicacionActual);
+        free(aux);
 
         ///PREGUNTAR SI HAY QUE HACER FREE DE ENTRADASRH (Problemas de referencias)
         for(int j = 0; j<indice; j++){
@@ -257,15 +258,14 @@ int main(int argc, char * args[]){
                     free(entradas[j]->valor);
                 free(entradas[j]);
             }
+
+            ///PREGUNTAR POR QUE SE ROMPE ACA (SUPONEMOS PROBLEMAS EN MANEJO DE MEMORIA)
             if(entradasRH[j]!=NULL){
-                if(entradasRH[j]->valor!=NULL)
-                    free(entradasRH[j]->valor);
                 free(entradasRH[j]);
             }
         }
 
 
         ///PREGUNTAR ERRORES RELATIVOS A TCLAVE A LA HORA DE ASIGNARLO
-        printf("FINAL");
     return 0;
 }
