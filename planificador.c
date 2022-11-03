@@ -86,7 +86,6 @@ int main(int argc, char * args[]){
             //1er caso, seteamos la ubicacion actual
             if(ubicacionActual->pos_x == -1 || ubicacionActual->pos_y == -1){
                 int ret = atoi(token);
-                printf("ret es %i\n",ret);
                 if(ubicacionActual->pos_x == -1)
                     ubicacionActual->pos_x = ret;
                 else{
@@ -98,11 +97,9 @@ int main(int argc, char * args[]){
             //2do caso, construimos una nueva entrada
             else{
                 if(aux->nombre == NULL){
-                    printf("Entre al if\n");
                     char * s = token;
                     strcpy(s, token);
                     aux->nombre = s;
-                    printf("Fin if\n");
                 }
                 else{
 
@@ -226,8 +223,10 @@ int main(int argc, char * args[]){
                         ubicacionActual = (TCiudad) actual->valor;
                         while(cp_cantidad(colaReducirHoras) != 0)
                             cp_eliminar(colaReducirHoras);
+                            /***/
                         for(int i = 0; i<indice; i++){
-                            if(entradasRH[i]->valor == ubicacionActual){
+
+                            if(entradasRH[i] !=NULL && entradasRH[i]->valor == ubicacionActual){
                                 free(entradasRH[i]);
                                 entradasRH[i] = NULL;
                             }
@@ -235,13 +234,13 @@ int main(int argc, char * args[]){
                                 entradasRH[i] -> clave = (int) distancia(ubicacionActual, entradasRH[i]->valor);
                             }
                         }
-
+                            /***/
                         for(int i = 0; i<indice; i++){
                             if(entradasRH[i] != NULL){
                                 cp_insertar(colaReducirHoras, entradasRH[i]);
+
                             }
                         }
-                        printf("???\n");
                     }
                     printf("Total recorrido %i", horasDeManejo);
                     cp_destruir(colaReducirHoras, noEliminarEntrada);
@@ -253,16 +252,20 @@ int main(int argc, char * args[]){
 
         ///PREGUNTAR SI HAY QUE HACER FREE DE ENTRADASRH (Problemas de referencias)
         for(int j = 0; j<indice; j++){
-
             if(entradas[j]!=NULL){
                 if(entradas[j]->valor!=NULL)
                     free(entradas[j]->valor);
                 free(entradas[j]);
             }
+            if(entradasRH[j]!=NULL){
+                if(entradasRH[j]->valor!=NULL)
+                    free(entradasRH[j]->valor);
+                free(entradasRH[j]);
+            }
         }
 
 
         ///PREGUNTAR ERRORES RELATIVOS A TCLAVE A LA HORA DE ASIGNARLO
-
+        printf("FINAL");
     return 0;
 }
