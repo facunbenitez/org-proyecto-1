@@ -57,97 +57,90 @@ int main(int argc, char * args[]){
     TEntrada entradas[100];
     TEntrada entradasRH[100];
 
-    /*FILE * archivo;
+    FILE * archivo;
     archivo = fopen(args[1], "r");
     if(argc != 2){
         perror("Se ingreso un archivo nulo");
         exit(-1);
-    }*/
+    }
 
-    char cadena[300] = "1;1\nSaliquelo;2;2\nBahia Blanca;4;4\nTrenque Lauquen;4;0\nCarhue;0;3";
-    printf("La cadena es: [ %s ]\n", cadena);
-   /* while(!feof(archivo)) ///REVISAR LAS LLAVES DE ESTO, TIENE QUE ENGLOBAR TODA LA 1ER PARTE
-        fscanf(archivo, "%s", cadena);*/
-    char delimitador[] = ";\n";
-    char * token = strtok(cadena, delimitador);
-
-    TCiudad aux = malloc(sizeof(struct ciudad));
-    ubicacionActual -> pos_x = -1;
-    ubicacionActual-> pos_y = -1;
-    aux -> nombre = NULL;
-    aux -> pos_x = -1;
-    aux -> pos_y = -1;
+    char cadena[300];
     int indice = 0;
 
-    if(token!= NULL){
-        while(token != NULL){
+    while(!feof(archivo)){
+        fscanf(archivo, "%s", cadena);
+        char delimitador[] = ";\n";
+        char * token = strtok(cadena, delimitador);
+
+        TCiudad aux = malloc(sizeof(struct ciudad));
+        ubicacionActual -> pos_x = -1;
+        ubicacionActual-> pos_y = -1;
+        aux -> nombre = NULL;
+        aux -> pos_x = -1;
+        aux -> pos_y = -1;
+
+        if(token!= NULL){
+            while(token != NULL){
 
 
-            //1er caso, seteamos la ubicacion actual
-            if(ubicacionActual->pos_x == -1 || ubicacionActual->pos_y == -1){
-                int ret = atoi(token);
-                if(ubicacionActual->pos_x == -1)
-                    ubicacionActual->pos_x = ret;
-                else{
-                    if(ubicacionActual->pos_x != -1 && ubicacionActual->pos_y == -1)
-                        ubicacionActual->pos_y = ret;
-                }
-
-            }
-            //2do caso, construimos una nueva entrada
-            else{
-                if(aux->nombre == NULL){
-                    char * s = token;
-                    strcpy(s, token);
-                    aux->nombre = s;
-                }
-                else{
-
-
-                    if(aux->pos_x == -1)
-                        aux->pos_x = atoi(token);
+                //1er caso, seteamos la ubicacion actual
+                if(ubicacionActual->pos_x == -1 || ubicacionActual->pos_y == -1){
+                    int ret = atoi(token);
+                    if(ubicacionActual->pos_x == -1)
+                        ubicacionActual->pos_x = ret;
                     else{
-                        if(aux->pos_y == -1){
-                            aux->pos_y = atoi(token);
-                            //Una vez que seteamos todos los valores de una ciudad, creamos la
-                            //entrada y la ubicamos en las colecciones de entradas.
-                            TEntrada eAux = malloc(sizeof(struct entrada));
-                            TEntrada eAuxRH = malloc(sizeof(struct entrada));
-                            int * c1 = malloc(sizeof(int));
-                            int * c2 = malloc(sizeof(int));
-                            *c1 = distancia(ubicacionActual, aux);
-                            *c2 = distancia(ubicacionActual, aux);
-                            eAux->clave = c1;
-                            eAuxRH->clave = c2;
+                        if(ubicacionActual->pos_x != -1 && ubicacionActual->pos_y == -1)
+                        ubicacionActual->pos_y = ret;
+                    }
 
-                            eAux->valor = aux;
-                            eAuxRH->valor = aux;
-                            entradas[indice] = eAux;
-                            entradasRH[indice] = eAuxRH;
-                            indice++;
-                            //Hacemos un malloc para cada ciudad de cada entrada en una variable aux.
+                }
+                //2do caso, construimos una nueva entrada
+                else{
+                    if(aux->nombre == NULL){
+                        char * s = token;
+                        strcpy(s, token);
+                        aux->nombre = s;
+                    }
+                    else{
+                        if(aux->pos_x == -1)
+                            aux->pos_x = atoi(token);
+                        else{
+                            if(aux->pos_y == -1){
+                                aux->pos_y = atoi(token);
+                                //Una vez que seteamos todos los valores de una ciudad, creamos la
+                                //entrada y la ubicamos en las colecciones de entradas.
+                                TEntrada eAux = malloc(sizeof(struct entrada));
+                                TEntrada eAuxRH = malloc(sizeof(struct entrada));
+                                int * c1 = malloc(sizeof(int));
+                                int * c2 = malloc(sizeof(int));
+                                *c1 = distancia(ubicacionActual, aux);
+                                *c2 = distancia(ubicacionActual, aux);
+                                eAux->clave = c1;
+                                eAuxRH->clave = c2;
 
-                            aux = malloc(sizeof(struct ciudad));
-                            aux -> nombre = NULL;
-                            aux -> pos_x = -1;
-                            aux -> pos_y = -1;
+                                eAux->valor = aux;
+                                eAuxRH->valor = aux;
+                                entradas[indice] = eAux;
+                                entradasRH[indice] = eAuxRH;
+                                indice++;
+                                //Hacemos un malloc para cada ciudad de cada entrada en una variable aux.
+
+                                aux = malloc(sizeof(struct ciudad));
+                                aux -> nombre = NULL;
+                                aux -> pos_x = -1;
+                                aux -> pos_y = -1;
+                            }
                         }
                     }
+
                 }
 
+                token = strtok(NULL, delimitador);
             }
 
-            token = strtok(NULL, delimitador);
         }
-
     }
 
-
-
-    printf("Ub actual: %f, %f\n", ubicacionActual->pos_x, ubicacionActual->pos_y);
-    for(int i = 0; i<indice; i++){
-        printf("Entrada %i : %s\n",i,((TCiudad)(entradas[i]->valor))->nombre);
-    }
     int horasDeManejo = 0;
     int op0 = 0;
     printf("Si desea finalizar la ejecucion, inserte 0 \n");
@@ -236,7 +229,6 @@ int main(int argc, char * args[]){
                         ubicacionActual = (TCiudad) actual->valor;
                         while(cp_cantidad(colaReducirHoras) != 0)
                             cp_eliminar(colaReducirHoras);
-                            /***/
                         for(int i = 0; i<indice; i++){
 
                             if(entradasRH[i] != entradaNula && entradasRH[i]->valor == ubicacionActual){
@@ -249,7 +241,6 @@ int main(int argc, char * args[]){
                                 entradasRH[i] -> clave = c1;
                             }
                         }
-                            /***/
                         for(int i = 0; i<indice; i++){
                             if(entradasRH[i] != entradaNula){
                                 cp_insertar(colaReducirHoras, entradasRH[i]);
@@ -264,28 +255,29 @@ int main(int argc, char * args[]){
             }
         }
         for(int j = 0; j<indice; j++){
-            int hayQueLiberar = 0;
+            int hayQueLiberar = 1;
             if(entradas[j]!=NULL){
-                hayQueLiberar = 1;
-                //free(((TCiudad)(entradas[j]->valor))->nombre);
-                free(entradas[j]->valor);
+                hayQueLiberar = 0;
+                if(entradasRH[j] == NULL){
+                    free(((TCiudad)(entradas[j]->valor))->nombre);
+                    free(entradas[j]->valor);
+                }
                 free(entradas[j]->clave);
                 free(entradas[j]);
+                entradas[j] = NULL;
             }
             if(entradasRH[j]!=entradaNula){
                if(hayQueLiberar){
-                    //free(((TCiudad)(entradasRH[j]->valor))->nombre);
-                    //free(entradasRH[j]->valor);
+                    free(((TCiudad)(entradasRH[j]->valor))->nombre);
+                    free(entradasRH[j]->valor);
                 }
                 free(entradasRH[j]->clave);
                 free(entradasRH[j]);
                 entradasRH[j] = entradaNula;
             }
-            printf("Valor de j: %i valor del indice: %i\n", j, indice);
         }
         free(entradaNula);
         free(ciudadNula);
-        printf("Paso el for\n");
 
     return 0;
 }
