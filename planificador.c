@@ -26,9 +26,9 @@ int comparadorMin(TEntrada e1, TEntrada e2){
     TClave clave1 = e1->clave;
     TClave clave2 = e2->clave;
 
-    if(clave1 < clave2)
+    if((*((int *)clave1) < (*((int *)clave2))))
         return 1;
-    else if(clave1 == clave2)
+    else if((*((int *)clave1) == (*((int *)clave2))))
         return 0;
     else
         return -1;
@@ -39,9 +39,9 @@ int comparadorMax(TEntrada e1, TEntrada e2){
     TClave clave1 = e1->clave;
     TClave clave2 = e2->clave;
 
-    if(clave1 > clave2)
+    if((*((int *)clave1) > (*((int *)clave2))))
         return 1;
-    else if(clave1 == clave2)
+    else if((*((int *)clave1) == (*((int *)clave2))))
         return 0;
     else
         return -1;
@@ -53,26 +53,25 @@ void noEliminarEntrada(TEntrada e){
 
 int main(int argc, char * args[]){
 
-    TCiudad ubicacionActual = malloc(sizeof(TCiudad));
+    TCiudad ubicacionActual = malloc(sizeof(struct ciudad));
     TEntrada entradas[100];
     TEntrada entradasRH[100];
-    ///HAY QUE HACER MALLOC DE LOS ARREGLOS? PROBLEMAS A LA HORA DE HACER FREE
 
     /*FILE * archivo;
     archivo = fopen(args[1], "r");
-    if(archivo == NULL){
+    if(argc != 2){
         perror("Se ingreso un archivo nulo");
         exit(-1);
     }*/
 
     char cadena[300] = "1;1\nSaliquelo;2;2\nBahia Blanca;4;4\nTrenque Lauquen;4;0\nCarhue;0;3";
     printf("La cadena es: [ %s ]\n", cadena);
-    //fscanf(archivo, "%s", cadena);
-    ///CONSULTAR SI ES LO MEJOR O SI DEBERIAMOS USAR OTRA FUNCION
+   /* while(!feof(archivo)) ///REVISAR LAS LLAVES DE ESTO, TIENE QUE ENGLOBAR TODA LA 1ER PARTE
+        fscanf(archivo, "%s", cadena);*/
     char delimitador[] = ";\n";
     char * token = strtok(cadena, delimitador);
 
-    TCiudad aux = malloc(sizeof(TCiudad));
+    TCiudad aux = malloc(sizeof(struct ciudad));
     ubicacionActual -> pos_x = -1;
     ubicacionActual-> pos_y = -1;
     aux -> nombre = NULL;
@@ -112,10 +111,15 @@ int main(int argc, char * args[]){
                             aux->pos_y = atoi(token);
                             //Una vez que seteamos todos los valores de una ciudad, creamos la
                             //entrada y la ubicamos en las colecciones de entradas.
-                            TEntrada eAux = malloc(sizeof(TEntrada));
-                            TEntrada eAuxRH = malloc(sizeof(TEntrada));
-                            eAux->clave = (int) distancia(ubicacionActual, aux);
-                            eAuxRH->clave = (int) distancia(ubicacionActual, aux);
+                            TEntrada eAux = malloc(sizeof(struct entrada));
+                            TEntrada eAuxRH = malloc(sizeof(struct entrada));
+                            int * c1 = malloc(sizeof(int));
+                            int * c2 = malloc(sizeof(int));
+                            *c1 = distancia(ubicacionActual, aux);
+                            *c2 = distancia(ubicacionActual, aux);
+                            eAux->clave = c1;
+                            eAuxRH->clave = c2;
+
                             eAux->valor = aux;
                             eAuxRH->valor = aux;
                             entradas[indice] = eAux;
@@ -123,7 +127,7 @@ int main(int argc, char * args[]){
                             indice++;
                             //Hacemos un malloc para cada ciudad de cada entrada en una variable aux.
 
-                            aux = malloc(sizeof(TCiudad));
+                            aux = malloc(sizeof(struct ciudad));
                             aux -> nombre = NULL;
                             aux -> pos_x = -1;
                             aux -> pos_y = -1;
@@ -135,6 +139,7 @@ int main(int argc, char * args[]){
 
             token = strtok(NULL, delimitador);
         }
+
     }
 
 
@@ -154,8 +159,8 @@ int main(int argc, char * args[]){
     TColaCP colaMax = crear_cola_cp(comparadorMax);
     TColaCP colaReducirHoras = crear_cola_cp(comparadorMin);
     int opcion = -1;
-    TCiudad ciudadNula = malloc(sizeof(TCiudad));
-    TEntrada entradaNula = malloc(sizeof(TEntrada));
+    TCiudad ciudadNula = malloc(sizeof(struct ciudad));
+    TEntrada entradaNula = malloc(sizeof(struct entrada));
     entradaNula->valor = ciudadNula;
         while(op0 == 0){
         printf("Indique la opcion deseada: ");
@@ -226,7 +231,8 @@ int main(int argc, char * args[]){
                     while(cp_cantidad(colaReducirHoras) != 0){
                         TEntrada actual = cp_eliminar(colaReducirHoras);
                         printf("%s \n", ((TCiudad) actual->valor)->nombre);
-                        horasDeManejo = horasDeManejo + actual->clave;
+                        int numaux = (*((int *)actual->clave));
+                        horasDeManejo = horasDeManejo +  numaux;
                         ubicacionActual = (TCiudad) actual->valor;
                         while(cp_cantidad(colaReducirHoras) != 0)
                             cp_eliminar(colaReducirHoras);
@@ -234,11 +240,13 @@ int main(int argc, char * args[]){
                         for(int i = 0; i<indice; i++){
 
                             if(entradasRH[i] != entradaNula && entradasRH[i]->valor == ubicacionActual){
-                                //free(entradasRH[i]);
+                                free(entradasRH[i]);
                                 entradasRH[i] = entradaNula;
                             }
                             else if(entradasRH[i] != entradaNula){
-                                entradasRH[i] -> clave = (int) distancia(ubicacionActual, entradasRH[i]->valor);
+                                int * c1 = entradasRH[i] -> clave;
+                                *c1 = distancia(ubicacionActual, entradasRH[i]->valor);
+                                entradasRH[i] -> clave = c1;
                             }
                         }
                             /***/
@@ -255,19 +263,21 @@ int main(int argc, char * args[]){
                 }
             }
         }
-        ///PREGUNTAR SI HAY QUE HACER FREE DE ENTRADASRH (Problemas de referencias)
         for(int j = 0; j<indice; j++){
+            int hayQueLiberar = 0;
             if(entradas[j]!=NULL){
-                if(entradas[j]->valor!=NULL){
-                    free(entradas[j]->valor);
-                    entradas[j]->valor = NULL;
-                }
+                hayQueLiberar = 1;
+                //free(((TCiudad)(entradas[j]->valor))->nombre);
+                free(entradas[j]->valor);
+                free(entradas[j]->clave);
                 free(entradas[j]);
-                entradas[j] = NULL;
             }
-
-            ///PREGUNTAR POR QUE SE ROMPE ACA (SUPONEMOS PROBLEMAS EN MANEJO DE MEMORIA)
             if(entradasRH[j]!=entradaNula){
+               if(hayQueLiberar){
+                    //free(((TCiudad)(entradasRH[j]->valor))->nombre);
+                    //free(entradasRH[j]->valor);
+                }
+                free(entradasRH[j]->clave);
                 free(entradasRH[j]);
                 entradasRH[j] = entradaNula;
             }
@@ -277,6 +287,5 @@ int main(int argc, char * args[]){
         free(ciudadNula);
         printf("Paso el for\n");
 
-        ///PREGUNTAR ERRORES RELATIVOS A TCLAVE A LA HORA DE ASIGNARLO
     return 0;
 }
